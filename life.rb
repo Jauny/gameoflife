@@ -1,8 +1,9 @@
 class Cell
-  attr_accessor :state
+  attr_accessor :state, :neighbors
 
   def initialize
     @state = :dead
+    @neighbors = 0
   end
 
   def born
@@ -16,6 +17,14 @@ class Cell
   def alive?
     self.state == :alive
   end
+
+  def evolve
+    if alive?
+      die if @neighbors < 2 || @neighbors > 3
+    else
+      born if @neighbors == 3
+    end
+  end
 end
 
 class Life
@@ -26,25 +35,13 @@ class Life
   end
 
   def generation
-    next_gen = @board.each_with_index.map do |cell, index|
-      neighbors_count = neighbors(index)
-
-      if neighbors_count < 2 || neighbors_count > 3
-        cell = :dead
-      elsif (neighbors_count == 2 && cell.alive?) || (neighbors_count == 3)
-        cell = :alive
-      end 
+    @board.each_with_index do |cell, index|
+      cell.neighbors = neighbors(index)
     end
 
-    next_gen.each_with_index do |state, index|
-      if state == :alive
-        @board[index].born
-      elsif state == :dead
-        @board[index].die
-      end
+    @board.each do |cell|
+      cell.evolve
     end
-
-    return @board
   end
 
   def neighbors(index)
