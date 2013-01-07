@@ -29,12 +29,10 @@ class Life
     next_gen = @board.each_with_index.map do |cell, index|
       neighbors_count = neighbors(index)
 
-      if neighbors_count < 2
+      if neighbors_count < 2 || neighbors_count > 3
         cell = :dead
       elsif (neighbors_count == 2 && cell.alive?) || (neighbors_count == 3)
         cell = :alive
-      elsif neighbors_count > 3
-        cell = :dead
       end 
     end
 
