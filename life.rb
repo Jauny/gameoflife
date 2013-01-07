@@ -1,95 +1,67 @@
-class Board
-  attr_reader :cells
+class Cell
+  attr_accessor :state
 
-  def initialize(size = 10)
-    @cells = Array.new(size) { Array.new(size, "_") } # board full of dead cells
+  def initialize
+    @state = :dead
   end
 
-  def size
-    @cells[0].size
+  def born
+    @state = :alive # @board exists in context of Life
   end
 
-  def cell(x, y)
-    @cells[x][y]
+  def die
+    @state = :dead
   end
 
-  def give_life(x, y)
-    @cells[x][y] = "0"
-  end
-
-  def kill(x, y)
-    @cells[x][y] = "_"
-  end
-
-  def alive?(x, y)
-    @cells[x][y] == "0"
-  end
-
-  def survival(x, y)
-    if neighbor_count(x, y) < 2 || neighbor_count > 3
-      kill(x, y)
-    elsif neighbor_count(x, y) == ( 2 && alive?(x, y) || 3 ) 
-      give_life(x, y)
-    end
-  end
-
-  def neighbor_count(x, y)
-    neighbors = [:left, :right, :top, :bottom, :topleft, :topright, :bottomleft, :bottomright]
-    count = 0
-    
-    neighbors.each do |neighbor|
-      count += 1 if self.send(neighbor, x, y)
-    end
-
-    return count
-  end
-
-  def top(x, y)
-    alive?(x - 1, y)
-  end
-
-  def bottom(x, y)
-    alive?(x + 1, y)
-  end
-
-  def left(x, y)
-    alive?(x, y - 1)
-  end
-
-  def right(x, y)
-    alive?(x, y + 1)
-  end
-
-  def topleft(x, y)
-    alive?(x - 1, y - 1)
-  end
-
-  def topright(x, y)
-    alive?(x - 1, y + 1)
-  end
-
-  def bottomleft(x, y)
-    alive?(x + 1, y - 1)
-  end
-
-  def bottomright(x, y)
-    alive?(x + 1, y + 1)
+  def alive?
+    self.state == :alive
   end
 end
-
 
 class Life
   attr_accessor :board
 
-  def initialize(args = {})
-    @board = Board.new(args[:board_size] = 10)
+  def initialize(size = 10)
+    @board = Array.new(size * size) { Cell.new }
   end
 
-  def give_life(x, y)
-    board.give_life(x, y)
+  def generation
+    next_gen = @board.each_with_index.map do |cell, index|
+      neighbors_count = neighbors(index)
+
+      if neighbors_count < 2
+        cell = :dead
+      elsif (neighbors_count == 2 && cell.alive?) || (neighbors_count == 3)
+        cell = :alive
+      elsif neighbors_count > 3
+        cell = :dead
+      end 
+    end
+
+    next_gen.each_with_index do |state, index|
+      if state == :alive
+        @board[index].born
+      elsif state == :dead
+        @board[index].die
+      end
+    end
+
+    return @board
   end
 
-  def kill(x, y)
-    board.kill(x, y)
+  def neighbors(index)
+    factor = Math.sqrt(@board.size)
+    count = 0
+
+    count += 1 if (index / factor) > 0 && (index % factor) > 0 && @board[index - (factor + 1)].alive? # top left
+    count += 1 if (index / factor) > 0 && @board[index - factor].alive? # top
+    count += 1 if (index / factor) > 0 && (index % factor) < (factor - 1) &&  @board[index - (factor - 1)].alive? # top right
+    count += 1 if (index % factor) > 0 && @board[index - 1].alive? # left, etc.. 
+    count += 1 if (index % factor) < (factor - 1) && @board[index + 1].alive?
+    count += 1 if (index % factor) > 0 && (index / factor) < (factor - 1) && @board[index + (factor - 1)].alive?
+    count += 1 if (index / factor) < (factor - 1) && @board[index + factor].alive?
+    count += 1 if (index % factor ) < (factor - 1) && (index / factor) < (factor - 1) && @board[index + (factor + 1)].alive?
+    
+    return count
   end
 end
