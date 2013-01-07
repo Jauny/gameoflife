@@ -60,6 +60,17 @@ Life.prototype = {
     });
   },
 
+  evolve: function() {
+    var self = this;
+    this.board.forEach( function(cell, index) {
+      self.neighbors(index);
+    });
+    
+    this.board.forEach( function(cell) {
+        cell.evolve();
+    });
+  },
+
   neighbors: function(index) {
     var factor = this.size;
     var board = this.board;
