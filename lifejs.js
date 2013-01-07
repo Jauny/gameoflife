@@ -61,38 +61,45 @@ Life.prototype = {
   },
 
   neighbors: function(index) {
+    var factor = this.size;
     var board = this.board;
     var index = index;
-    var factor = this.size;
     var count = 0;
-
-    console.log( board[ index ], index );
-
-    if ( (index / factor) > 0 && (index % factor) > 0 && board[index - (factor + 1)].is_alive() ) {
-      count++;
+    
+    // left
+    if ( index % factor > 0 && board[index - 1].is_alive() ) {
+        count += 1;
     }
-    if ( (index / factor) > 0 && board[index - factor].is_alive() ) {
-      count++;
+    // right
+    if ( index % factor < factor - 1 && board[index + 1].is_alive() ) {
+        count += 1;
     }
-    if ( (index / factor) > 0 && (index % factor) < (factor - 1) &&  board[index - (factor - 1)].is_alive() ) {
-      count++;
+    // top
+    if ( Math.floor(index / factor) > 0 && board[index - factor].is_alive()) {
+        count += 1;
     }
-    if ( (index % factor) > 0 && board[index - 1].is_alive() ) {
-      count++;
+    // bottom
+    if ( Math.floor(index / factor) < factor - 1 && board[index + factor].is_alive() ) {
+        count += 1;
     }
-    if ( (index % factor) < (factor - 1) && board[index + 1].is_alive() ) {
-      count++;
+    // topleft
+    if ( Math.floor(index / factor) > 0 && index % factor > 0 && board[index - factor - 1].is_alive() ) {
+        count += 1;
     }
-    if ( (index % factor) > 0 && (index / factor) < (factor - 1) && board[index + (factor - 1)].is_alive() ) {
-      count++;
+    // topright
+    if ( Math.floor(index / factor) > 0 && index % factor < factor - 1 && board[index - factor + 1].is_alive() ) {
+        count += 1 ;
     }
-    if ( (index / factor) < (factor - 1) && board[index + factor].is_alive() ) {
-      count++;
+    // bottomleft
+    if ( Math.floor(index / factor) < factor - 1 && index % factor > 0 && board[index + factor - 1].is_alive() ) {
+        count += 1;
     }
-    if ( (index % factor ) < (factor - 1) && (index / factor) < (factor - 1) && board[index + (factor + 1)].is_alive() ) {
-      count++;
+    // bottomright
+    if ( Math.floor(index / factor) < factor - 1 && index % factor < factor - 1 && board[index + factor + 1].is_alive() ) {
+        count += 1;
     }
     
     board[index].neighbors = count;
+    return count;
   }
 };
