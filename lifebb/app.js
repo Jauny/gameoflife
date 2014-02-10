@@ -47,12 +47,22 @@ $(function () {
     }
   });
 
-  // Cells Collection
+  // Cells Collection (board)
   Cells = Backbone.Collection.extend({
     model: Cell,
 
     // board for next life cycle
-    nextLife: null
+    nextBoard: [],
+
+    initialize: function() {
+      this.listenTo(this, 'nextLifeCycle', this.nextLifeCycle);
+    },
+
+    nextLifeCycle: function() {
+      _.each(this.models, function(model) {
+        model.alive = false;
+      })
+    }
   });
 
   // Cells Collection View
@@ -61,7 +71,7 @@ $(function () {
 
     initialize: function() {
       this.listenTo(this.collection, 'add', this.addOne);
-      this.listenTo(this.collection, 'reset', this.render);
+      this.listenTo(this.collection, 'nextLifeCycle', this.render);
     },
 
     addOne: function(model) {
@@ -82,6 +92,19 @@ $(function () {
     }
   });
 
+  // life cycle button view
+  NextView = Backbone.View.extend({
+    el: '#nextLife',
+
+    events: {
+      'click': 'nextLifeCycle'
+    },
+
+    nextLifeCycle: function() {
+      this.collection.trigger('nextLifeCycle');
+    }
+  });
+
   // main app
   App = Backbone.View.extend({
     el: $('#board'),
@@ -89,6 +112,9 @@ $(function () {
     initialize: function() {
       this.cells = new Cells();
       this.cellsView = new CellsView({
+        collection: this.cells
+      });
+      this.next = new NextView({
         collection: this.cells
       });
     },
