@@ -61,27 +61,87 @@ $(function () {
     },
 
     cellLeft: function(cell) {
-      var index = this.cellIndex(cell) - 1;
-      if (index < 0) {
+      var index = this.cellIndex(cell);
+      if (index % WIDTH == 0) {
         return null;
       } else {
-        return this.models[index];
+        return this.models[index - 1];
       }
     },
 
     cellRight: function(cell) {
-      var index = this.cellIndex(cell) + 1;
-      if (index < this.length) {
-        return this.models[index];
+      var index = this.cellIndex(cell);
+      if ((index + 1) % WIDTH == 0) {
+        return null;
+      } else {
+        return this.models[index + 1];
+      }
+    },
+
+    cellTop: function(cell) {
+      var index = this.cellIndex(cell);
+      if (index < WIDTH) {
+        return null;
+      } else {
+        return this.models[index - WIDTH];
+      }
+    },
+
+    cellBot: function(cell) {
+      var index = this.cellIndex(cell);
+      if ((index + WIDTH) < WIDTH*HEIGHT) {
+        return this.models[index + WIDTH];
       } else {
         return null;
+      }
+    },
+
+    cellTopLeft: function(cell) {
+      var index = this.cellIndex(cell);
+      if ((index < WIDTH) || (index % WIDTH == 0)) {
+        return null;
+      } else {
+        return this.models[index - WIDTH - 1];
+      }
+    },
+
+    cellTopRight: function(cell) {
+      var index = this.cellIndex(cell);
+      if ((index < WIDTH) || ((index + 1) % WIDTH == 0)) {
+        return null;
+      } else {
+        return this.models[index - WIDTH + 1];
+      }
+    },
+
+    cellBotLeft: function(cell) {
+      var index = this.cellIndex(cell);
+      if (((index + WIDTH) >= WIDTH*HEIGHT) || (index % WIDTH == 0)) {
+        return null;
+      } else {
+      return this.models[index + WIDTH - 1];
+      }
+    },
+
+    cellBotRight: function(cell) {
+      var index = this.cellIndex(cell);
+      if (((index + WIDTH) >= WIDTH*HEIGHT) || (((index + 1) % WIDTH) == 0)) {
+        return null;
+      } else {
+        return this.models[index + WIDTH + 1];
       }
     },
 
     getNeighbors: function(cell) {
       var neighbors = [];
-      neighbors.push(this.cellRight(cell));
       neighbors.push(this.cellLeft(cell));
+      neighbors.push(this.cellRight(cell));
+      neighbors.push(this.cellTop(cell));
+      neighbors.push(this.cellBot(cell));
+      neighbors.push(this.cellTopLeft(cell));
+      neighbors.push(this.cellTopRight(cell));
+      neighbors.push(this.cellBotLeft(cell));
+      neighbors.push(this.cellBotRight(cell));
 
       return _.reject(neighbors, function(cell) {
         return (cell == null) || (cell && cell.status() == 'dead');
@@ -93,10 +153,19 @@ $(function () {
 
       _.each(_this.models, function(model) {
         var neighbors = _this.getNeighbors(model);
-        if (neighbors.length > 1) {
-          _this.nextBoard.push(new Cell(true));
+
+        if (model.alive) {
+          if (neighbors.length == 2 || neighbors.length == 3) {
+            _this.nextBoard.push(new Cell(true));
+          } else {
+            _this.nextBoard.push(new Cell(false));
+          }
         } else {
-          _this.nextBoard.push(new Cell(false));
+          if (neighbors.length == 3) {
+            _this.nextBoard.push(new Cell(true));
+          } else {
+            _this.nextBoard.push(new Cell(false));
+          }
         }
       })
 
@@ -162,13 +231,16 @@ $(function () {
     },
 
     start: function() {
-      for (var i = 0; i < 100; i++) {
+      for (var i = 0; i < (WIDTH*HEIGHT); i++) {
         this.cells.add(new Cell);
       }
     }
   });
 
   // initialize everything
+  HEIGHT = 25;
+  WIDTH = 25;
+
   window.app = new App();
   window.app.start();
 });
