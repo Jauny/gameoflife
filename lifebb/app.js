@@ -1,9 +1,8 @@
 $(function () {
   // Cell Model
   Cell = Backbone.Model.extend({
-    initialize: function(board) {
-      this.board = board;
-      this.alive = false;
+    initialize: function(alive) {
+      this.alive = alive || false;
 
       this.listenTo(this, 'toggleStatus', this.toggleStatus);
     },
@@ -20,7 +19,7 @@ $(function () {
   // Cell view
   CellView = Backbone.View.extend({
     tagName: 'div',
-    className: 'cell dead',
+    className: 'cell',
     template: _.template($('#cell-view-template').html()),
 
     events: {
@@ -40,7 +39,7 @@ $(function () {
     },
 
     render: function() {
-      this.$el.html(this.template(this.model));
+      this.$el.html(this.template(this.model)).addClass(this.model.status());
 
       return this;
     }
@@ -57,10 +56,39 @@ $(function () {
       this.listenTo(this, 'nextLifeCycle', this.nextLifeCycle);
     },
 
+    cellIndex: function(cell) {
+      return this.models.indexOf(cell);
+    },
+
+    cellLeft: function(cell) {
+      var index = this.cellIndex(cell) - 1;
+      if (index < 0) {
+        return null;
+      } else {
+        return this.models[index];
+      }
+    },
+
     nextLifeCycle: function() {
-      _.each(this.models, function(model) {
-        model.alive = false;
+      var _this = this;
+
+      _.each(_this.models, function(model) {
+        var left = _this.cellLeft(model);
+
+        if (left && left.status() == 'alive' && model.status() == 'alive') {
+          _this.nextBoard.push(new Cell(true));
+        } else {
+          _this.nextBoard.push(new Cell(false));
+        }
       })
+
+      console.log(_this.models);
+      console.log(_this.nextBoard);
+      _this.models = _this.nextBoard;
+      _this.nextBoard = [];
+      console.log(_this.models);
+      console.log(_this.nextBoard);
+      this.trigger('renderNextBoard');
     }
   });
 
@@ -70,7 +98,8 @@ $(function () {
 
     initialize: function() {
       this.listenTo(this.collection, 'add', this.addOne);
-      this.listenTo(this.collection, 'nextLifeCycle', this.render);
+      this.listenTo(this.collection, 'change', this.render);
+      this.listenTo(this.collection, 'renderNextBoard', this.render);
     },
 
     addOne: function(model) {
@@ -84,6 +113,7 @@ $(function () {
     },
 
     render: function() {
+      console.log('rendering');
       this.$el.html('');
       this.collection.forEach(this.addOne, this);
 
