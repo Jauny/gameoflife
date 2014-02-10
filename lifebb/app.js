@@ -69,25 +69,39 @@ $(function () {
       }
     },
 
+    cellRight: function(cell) {
+      var index = this.cellIndex(cell) + 1;
+      if (index < this.length) {
+        return this.models[index];
+      } else {
+        return null;
+      }
+    },
+
+    getNeighbors: function(cell) {
+      var neighbors = [];
+      neighbors.push(this.cellRight(cell));
+      neighbors.push(this.cellLeft(cell));
+
+      return _.reject(neighbors, function(cell) {
+        return (cell == null) || (cell && cell.status() == 'dead');
+      });
+    },
+
     nextLifeCycle: function() {
       var _this = this;
 
       _.each(_this.models, function(model) {
-        var left = _this.cellLeft(model);
-
-        if (left && left.status() == 'alive' && model.status() == 'alive') {
+        var neighbors = _this.getNeighbors(model);
+        if (neighbors.length > 1) {
           _this.nextBoard.push(new Cell(true));
         } else {
           _this.nextBoard.push(new Cell(false));
         }
       })
 
-      console.log(_this.models);
-      console.log(_this.nextBoard);
       _this.models = _this.nextBoard;
       _this.nextBoard = [];
-      console.log(_this.models);
-      console.log(_this.nextBoard);
       this.trigger('renderNextBoard');
     }
   });
@@ -113,7 +127,6 @@ $(function () {
     },
 
     render: function() {
-      console.log('rendering');
       this.$el.html('');
       this.collection.forEach(this.addOne, this);
 
