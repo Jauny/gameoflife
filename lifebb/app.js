@@ -238,8 +238,8 @@ $(function () {
   });
 
   // initialize everything
-  HEIGHT = 25;
-  WIDTH = 25;
+  HEIGHT = 20;
+  WIDTH = 20;
 
   window.app = new App();
   window.app.start();

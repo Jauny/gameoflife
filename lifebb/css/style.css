@@ -9,8 +9,8 @@
 }
 
 #board .cell {
-  width: 18px;
-  height: 18px;
+  width: 23px;
+  height: 23px;
   margin: 1px;
   background-color: #9fb4b0;
   float: left;
