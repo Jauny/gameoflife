@@ -38,7 +38,7 @@ Cell.prototype = {
 // game
 var Life = function(size) {
   this.size = typeof size !== 'undefined' ? size : 10;
-  
+
   this.board = new Array;
   for (size = Math.pow(this.size, 2); size>0; size--) {
     this.board.push(new Cell)
@@ -46,9 +46,6 @@ var Life = function(size) {
 };
 
 Life.prototype = {
-  size: 5,
-  board: new Array,
-
   generation: function() {
     var self = this;
     this.board.forEach( function(cell, index) {
@@ -65,7 +62,7 @@ Life.prototype = {
     this.board.forEach( function(cell, index) {
       self.neighbors(index);
     });
-    
+
     this.board.forEach( function(cell) {
         cell.evolve();
     });
@@ -76,7 +73,7 @@ Life.prototype = {
     var board = this.board;
     var index = index;
     var count = 0;
-    
+
     // left
     if ( index % factor > 0 && board[index - 1].is_alive() ) {
         count += 1;
@@ -109,7 +106,7 @@ Life.prototype = {
     if ( Math.floor(index / factor) < factor - 1 && index % factor < factor - 1 && board[index + factor + 1].is_alive() ) {
         count += 1;
     }
-    
+
     board[index].neighbors = count;
     return count;
   }
