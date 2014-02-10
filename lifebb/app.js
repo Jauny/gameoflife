@@ -4,6 +4,8 @@ $(function () {
     initialize: function(board) {
       this.board = board;
       this.alive = false;
+
+      this.listenTo(this, 'toggleStatus', this.toggleStatus);
     },
 
     toggleStatus: function() {
@@ -21,9 +23,15 @@ $(function () {
       'click': 'toggleStatus'
     },
 
-    toggleStatus: function() {
-      this.model.toggleStatus();
+    initialize: function() {
+      this.listenTo(this.model, 'toggleStatus', this.toggleClass);
+    },
 
+    toggleStatus: function() {
+      this.model.trigger('toggleStatus');
+    },
+
+    toggleClass: function() {
       // big hack need a better way of doing so
       if (this.model.alive) {
         $(this.$el[0]).addClass('alive');
@@ -53,6 +61,7 @@ $(function () {
 
     initialize: function() {
       this.listenTo(this.collection, 'add', this.addOne);
+      this.listenTo(this.collection, 'reset', this.render);
     },
 
     addOne: function(model) {
