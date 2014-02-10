@@ -8,6 +8,10 @@ $(function () {
       this.listenTo(this, 'toggleStatus', this.toggleStatus);
     },
 
+    status: function() {
+      return this.alive ? 'alive' : 'dead';
+    },
+
     toggleStatus: function() {
       this.alive = !this.alive;
     }
@@ -16,7 +20,7 @@ $(function () {
   // Cell view
   CellView = Backbone.View.extend({
     tagName: 'div',
-    className: 'cell',
+    className: 'cell dead',
     template: _.template($('#cell-view-template').html()),
 
     events: {
@@ -32,12 +36,7 @@ $(function () {
     },
 
     toggleClass: function() {
-      // big hack need a better way of doing so
-      if (this.model.alive) {
-        $(this.$el[0]).addClass('alive');
-      } else {
-        $(this.$el[0]).removeClass('alive');
-      }
+      $(this.el).attr('class', 'cell ' + this.model.status());
     },
 
     render: function() {
