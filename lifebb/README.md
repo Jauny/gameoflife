@@ -1,4 +1,5 @@
 ## Conway's Game of Life
+[www.jypepin.com/lifebb](http://www.jypepin.com/lifebb)
 
 [Wikipedia article](http://en.wikipedia.org/wiki/Conway's_Game_of_Life)
 
